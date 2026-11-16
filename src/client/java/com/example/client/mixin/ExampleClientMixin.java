@@ -1,15 +1,21 @@
-package com.example.client.mixin;
+package net.fabricmc.example.mixin;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Minecraft.class)
-public class ExampleClientMixin {
-	@Inject(at = @At("HEAD"), method = "run")
-	private void init(CallbackInfo info) {
-		// This code is injected into the start of Minecraft.run()V
-	}
+@Mixin(Entity.class)
+public class ExampleMixin {
+
+    @Inject(method = "shouldRender(D)Z", at = @At("HEAD"), cancellable = true)
+    private void disableLagEntities(double distance, CallbackInfoReturnable<Boolean> cir) {
+        Entity entity = (Entity) (Object) this;
+        if (entity instanceof ItemEntity || entity instanceof ArmorStandEntity) {
+            cir.setReturnValue(false);
+        }
+    }
 }
